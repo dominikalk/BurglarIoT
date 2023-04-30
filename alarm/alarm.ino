@@ -33,21 +33,22 @@ void loop() {
 
   if (Serial.available() > 0) {
     String msg = Serial.readString();
+    int delimiter = msg.indexOf("_");
+    String msg1 = msg.substring(0, delimiter);
+    String msg2 = msg.substring(delimiter + 1);
 
-    if (msg == "Enabled: True"){
+    if (msg1 == "Enabled: True" || msg2 == "Enabled: True"){
       alarmEnabled = true;
-    } else if (msg == "Enabled: False") {
+    } else if (msg1 == "Enabled: False" || msg2 == "Enabled: False") {
       alarmEnabled = false;
     }
 
-    if (msg == "Triggered: True"){
+    if (msg1 == "Triggered: True" || msg2 == "Triggered: True"){
       triggerEnabled = HIGH;
-    } else if (msg == "Triggered: False") {
+    } else if (msg1 == "Triggered: False" || msg2 == "Triggered: False") {
       triggerEnabled = LOW;
     }
   }
-
-  // int triggerAlarm = LOW;
 
   if (alarmEnabled) {
     if (MotionState1 == 1){
@@ -63,19 +64,12 @@ void loop() {
   }
 
   if (triggerEnabled == HIGH){
-    // digitalWrite(buzzerPin, triggerAlarm);
-    //delay(3000);
-    Serial.println("Movement: True");
+    Serial.println("Triggered: True");
   } else {
-    Serial.println("Movement: False");
+    Serial.println("Triggered: False");
   }
-  // if (alarmEnabled) {
-  //   Serial.println("Enabled: True");
-  // } else {
-  //   Serial.println("Enabled: False");
-  // }
 
-  // digitalWrite(buzzerPin, triggerAlarm);
+  // digitalWrite(buzzerPin, triggerEnabled);
   digitalWrite(buttonPin, triggerEnabled);
   delay(1000);
 }

@@ -17,6 +17,8 @@ def on_publish(client,userdata,result):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    global data_changed
+
     if not ard: return
     print ('Topic: ' + msg.topic + '\nMessage: ' + str(msg.payload))
     # Decode JSON request
@@ -25,10 +27,16 @@ def on_message(client, userdata, msg):
     if data['method'] == 'setValue':
         params = data['params']
         if 'enabled' in params:
-            # alarm_state['enabled'] = params['enabled']
+            if alarm_state['enabled'] != params['enabled']: 
+                data_changed = True
+            alarm_state['enabled'] = params['enabled']
+
+            print(f"Testing enabled {params['enabled']}")
             ard.write(f"Enabled: {params['enabled']}".encode('utf-8'))
+            if not params['enabled']:
+                ard.write(f"_Triggered: False".encode('utf-8'))
+                alarm_state['triggered'] = False
         if 'triggered' in params:
-            # alarm_state['triggered'] = params['triggered']
             ard.write(f"Triggered: {params['triggered']}".encode('utf-8'))
     
 # The callback for when the client receives a CONNACK response from the server.
@@ -71,22 +79,28 @@ try:
             print("----------")
 
     ard = serial.Serial(com_port, 9600, timeout=0.1)
+    ard.write("Triggered: False".encode('utf-8'))
+    ard.write("Enabled: False".encode('utf-8'))
 
     while True:
-        enabled = False
-        triggered = False
-        for i in range(2):
-            line = ard.readline().decode().strip()
-            if i == 0: triggered = "True" in line
-            else: enabled = "True" in line
-            if line: print(line)
+        triggered = alarm_state['triggered']
+        line = ard.readline().decode().strip()
+        if 'Triggered' in line:
+            new_triggered = "True" in line
+
+            if triggered != new_triggered:
+                data_changed = True
+            
+            alarm_state['triggered'] = new_triggered
         
-        alarm_state['enabled'] = enabled
-        alarm_state['triggered'] = triggered
+        print (f"Triggered: {alarm_state['triggered']}")
+        print (f"Enabled: {alarm_state['enabled']}")
 
         # Sending humidity, temperature data and buzzer status to ThingsBoard
-        client.publish('v1/devices/me/telemetry', json.dumps(alarm_state), 1)
+        if data_changed:
+            client.publish('v1/devices/me/telemetry', json.dumps(alarm_state), 1)
 
+        data_changed = False
         next_reading += INTERVAL
         sleep_time = next_reading-time.time()
         if sleep_time > 0:
