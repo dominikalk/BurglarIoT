@@ -85,6 +85,7 @@ try:
     while True:
         triggered = alarm_state['triggered']
         line = ard.readline().decode().strip()
+        print(f"ReadLine: {line}")
         if 'Triggered' in line:
             new_triggered = "True" in line
 

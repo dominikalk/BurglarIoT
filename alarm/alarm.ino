@@ -1,48 +1,62 @@
-#define PIR_MOTION_SENSOR_1 2
-#define PIR_MOTION_SENSOR_2 3
+#include <Wire.h>
+#include "rgb_lcd.h"
 
-const int soundPin = 4;   
-const int buzzerPin = 5;  
+#define PIR_MOTION_SENSOR_1 5
+
 const int buttonPin = 6;
+const int buzzerPin = 8;  
 
-int MotionState1;         // the state of the Motion SENSOR 1 (PIR)
-int MotionState2;         // the state of the Motion SENSOR 2 (PIR)
-int soundState;
+int MotionState1;         // the state of the Motion SENSOR (PIR)
 int buzzerState = LOW;
 int buttonState = LOW;
 
 bool alarmEnabled = false;
 int triggerEnabled = LOW;
 
+rgb_lcd lcd;
+
 void setup() {
+  // setup pin modes
   pinMode(PIR_MOTION_SENSOR_1, INPUT);
-  pinMode(PIR_MOTION_SENSOR_2, INPUT);
-  pinMode(soundPin, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(buttonPin, OUTPUT);
+  // set default values to outputs
   digitalWrite(buzzerPin, buzzerState);
   digitalWrite(buttonPin, buttonState);
+
   Serial.begin(9600);
+  // initialise lcd screen
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Burglar System  ");
+  lcd.setCursor(0, 1);
+  lcd.print("Inactive.       ");
 }
 
 void loop() {
-  // Reading Data from Sensors
+  // Reading Data from Sensor
   MotionState1 = digitalRead(PIR_MOTION_SENSOR_1);
-  MotionState2 = digitalRead(PIR_MOTION_SENSOR_2);
-  soundState = digitalRead(soundPin);
 
+  // initialise previous variables for comparison
+  int prevTriggerEnabled = triggerEnabled;
+  bool prevAlarmEnabled = alarmEnabled;
+
+  // handle messages from python script
   if (Serial.available() > 0) {
+    // parse message
     String msg = Serial.readString();
     int delimiter = msg.indexOf("_");
     String msg1 = msg.substring(0, delimiter);
     String msg2 = msg.substring(delimiter + 1);
 
+    // handle message if enabled changed
     if (msg1 == "Enabled: True" || msg2 == "Enabled: True"){
       alarmEnabled = true;
     } else if (msg1 == "Enabled: False" || msg2 == "Enabled: False") {
       alarmEnabled = false;
     }
 
+    // handle message if triggered changed
     if (msg1 == "Triggered: True" || msg2 == "Triggered: True"){
       triggerEnabled = HIGH;
     } else if (msg1 == "Triggered: False" || msg2 == "Triggered: False") {
@@ -50,26 +64,46 @@ void loop() {
     }
   }
 
+  // check if motion detected
   if (alarmEnabled) {
-    if (MotionState1 == 1){
+    if (MotionState1 == HIGH){
       triggerEnabled = HIGH;
     }
-    if (MotionState2 == 1){
-      triggerEnabled = HIGH;
-    }
-    // if (soundState == HIGH){
-    //   triggerAlarm = HIGH;
-    //   Serial.println("Sound");
-    // }
   }
 
+  // send motion message to python script
   if (triggerEnabled == HIGH){
     Serial.println("Triggered: True");
   } else {
     Serial.println("Triggered: False");
   }
 
-  // digitalWrite(buzzerPin, triggerEnabled);
-  digitalWrite(buttonPin, triggerEnabled);
+  // write to buzzer and button outputs
+  if ((millis()/500) % 3 != 0) {
+    digitalWrite(buzzerPin, triggerEnabled);
+    // digitalWrite(buttonPin, triggerEnabled);
+  } else {
+    digitalWrite(buzzerPin, LOW);
+  }
+
+  // write to lcd screen if values have changed
+  if(alarmEnabled != prevAlarmEnabled || triggerEnabled != prevTriggerEnabled) {
+    if (alarmEnabled == false) {
+      lcd.setRGB(255, 255, 255);
+      lcd.setCursor(0, 1);
+      lcd.print("Inactive.       ");
+    } 
+    else if (triggerEnabled == LOW) {
+      lcd.setRGB(0, 255, 0);
+      lcd.setCursor(0, 1);
+      lcd.print("Active.         ");
+    } 
+    else if (triggerEnabled == HIGH){
+      lcd.setRGB(255, 0, 0);
+      lcd.setCursor(0, 1);
+      lcd.print("Triggered.      ");
+    }
+  }
+
   delay(1000);
 }
