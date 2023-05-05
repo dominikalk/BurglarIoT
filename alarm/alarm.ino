@@ -1,19 +1,16 @@
 #include <Wire.h>
 #include "rgb_lcd.h"
 
-#define PIR_MOTION_SENSOR_1 5
-
-const int buttonPin = 6;
-const int buzzerPin = 8;  
+#define PIR_MOTION_SENSOR_1 5 // the digital pin of the PIR sensor
+const int buzzerPin = 8;  // digital pin number of the buzzer
 
 int MotionState1;         // the state of the Motion SENSOR (PIR)
-int buzzerState = LOW;
-int buttonState = LOW;
+int buzzerState = LOW;    // the state of the buzzer
 
-bool alarmEnabled = false;
+bool alarmEnabled = false;  
 int triggerEnabled = LOW;
 
-rgb_lcd lcd;
+rgb_lcd lcd; // initialise lcd screen
 
 void setup() {
   // setup pin modes
@@ -78,10 +75,9 @@ void loop() {
     Serial.println("Triggered: False");
   }
 
-  // write to buzzer and button outputs
+  // write to buzzer outputs
   if ((millis()/500) % 3 != 0) {
     digitalWrite(buzzerPin, triggerEnabled);
-    // digitalWrite(buttonPin, triggerEnabled);
   } else {
     digitalWrite(buzzerPin, LOW);
   }

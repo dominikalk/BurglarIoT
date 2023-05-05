@@ -5,84 +5,6 @@
   "mobileOrder": null,
   "configuration": {
     "widgets": {
-      "5c9bc29a-87d2-0033-49c6-f57607cd08e3": {
-        "isSystemType": true,
-        "bundleAlias": "cards",
-        "typeAlias": "entities_table",
-        "type": "latest",
-        "title": "Entities table",
-        "sizeX": 15,
-        "sizeY": 13,
-        "row": 0,
-        "col": 2,
-        "config": {
-          "timewindow": {
-            "realtime": {
-              "interval": 1000,
-              "timewindowMs": 86400000
-            },
-            "aggregation": {
-              "type": "NONE",
-              "limit": 200
-            }
-          },
-          "showTitle": true,
-          "backgroundColor": "rgb(255, 255, 255)",
-          "color": "rgba(0, 0, 0, 0.87)",
-          "padding": "4px",
-          "settings": {
-            "enableSearch": true,
-            "displayPagination": true,
-            "defaultPageSize": 10,
-            "defaultSortOrder": "entityName",
-            "displayEntityName": true,
-            "displayEntityType": true,
-            "enableSelectColumnDisplay": true,
-            "enableStickyHeader": true,
-            "enableStickyAction": true,
-            "reserveSpaceForHiddenAction": "true",
-            "displayEntityLabel": false,
-            "useRowStyleFunction": false
-          },
-          "title": "Entities table",
-          "dropShadow": true,
-          "enableFullscreen": true,
-          "titleStyle": {
-            "fontSize": "16px",
-            "fontWeight": 400,
-            "padding": "5px 10px 5px 10px"
-          },
-          "useDashboardTimewindow": false,
-          "showLegend": false,
-          "datasources": [
-            {
-              "type": "entity",
-              "name": null,
-              "entityAliasId": "9d73b2e8-7028-b54e-6378-f90b93b4ff53",
-              "filterId": null,
-              "dataKeys": [
-                {
-                  "name": "triggered",
-                  "label": "triggered",
-                  "type": "timeseries",
-                  "color": "#2196f3",
-                  "settings": {},
-                  "_hash": 0.6446102890820327
-                },
-                {
-                  "name": "enabled",
-                  "label": "enabled",
-                  "type": "timeseries",
-                  "color": "#4caf50",
-                  "settings": {},
-                  "_hash": 0.58092539334787
-                }
-              ]
-            }
-          ]
-        },
-        "id": "5c9bc29a-87d2-0033-49c6-f57607cd08e3"
-      },
       "264b7c41-ccc2-6e17-de39-f27eebb0da75": {
         "isSystemType": true,
         "bundleAlias": "control_widgets",
@@ -105,7 +27,7 @@
             "getValueMethod": "getValue",
             "setValueMethod": "setValue",
             "showOnOffLabels": true,
-            "title": "Burglar System Enabled",
+            "title": "Burglar System Armed",
             "retrieveValueMethod": "timeseries",
             "parseValueFunction": "return data ? true : false;",
             "convertValueFunction": "return {enabled: value};",
@@ -283,29 +205,23 @@
         "layouts": {
           "main": {
             "widgets": {
-              "5c9bc29a-87d2-0033-49c6-f57607cd08e3": {
-                "sizeX": 7,
-                "sizeY": 6,
-                "row": 0,
-                "col": 0
-              },
               "264b7c41-ccc2-6e17-de39-f27eebb0da75": {
                 "sizeX": 5,
                 "sizeY": 2,
                 "row": 3,
-                "col": 7
+                "col": 0
               },
               "60006959-405c-1f3b-8e24-8a2b92492df5": {
                 "sizeX": 3,
                 "sizeY": 2,
                 "row": 3,
-                "col": 12
+                "col": 5
               },
               "c63ef02b-bea2-768b-b0af-67de6e8a6f11": {
                 "sizeX": 8,
                 "sizeY": 3,
                 "row": 0,
-                "col": 7
+                "col": 0
               }
             },
             "gridSettings": {
