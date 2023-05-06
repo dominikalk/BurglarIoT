@@ -16,10 +16,8 @@ void setup() {
   // setup pin modes
   pinMode(PIR_MOTION_SENSOR_1, INPUT);
   pinMode(buzzerPin, OUTPUT);
-  pinMode(buttonPin, OUTPUT);
   // set default values to outputs
   digitalWrite(buzzerPin, buzzerState);
-  digitalWrite(buttonPin, buttonState);
 
   Serial.begin(9600);
   // initialise lcd screen
